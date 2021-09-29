@@ -1,10 +1,8 @@
 {
-  "name": "lif-tools",
+  "name": "@weblif/preset-cli",
   "author": "苯苯 <854363956@qq.com>",
-  "version": "0.0.1",
-  "bin": {
-    "lif-tools": "bin/cli.js"
-  },
+  "version": "0.0.2",
+  "bin": "bin/cli.js",
   "license": "MIT",
   "files": [
     "bin",
@@ -13,7 +11,8 @@
   "scripts": {
     "start": "tsc --watch",
     "build": "tsc",
-    "publish:canary": "npm publish --tag canary"
+    "publish:canary": "npm publish --tag canary --access public",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "ansi-colors": "^4.1.1",
