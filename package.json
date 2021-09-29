@@ -2,7 +2,9 @@
   "name": "lif-tools",
   "author": "苯苯 <854363956@qq.com>",
   "version": "0.0.1",
-  "bin": "bin/cli.js",
+  "bin": {
+    "lif-tools": "bin/cli.js"
+  },
   "license": "MIT",
   "files": [
     "bin",
