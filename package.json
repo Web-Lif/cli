@@ -1,7 +1,7 @@
 {
   "name": "@weblif/preset-cli",
   "author": "苯苯 <854363956@qq.com>",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "bin": "bin/cli.js",
   "license": "MIT",
   "files": [

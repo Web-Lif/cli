@@ -25,14 +25,7 @@ module.exports = {
     rules: {
         'indent': ['error', 4],
         'react/jsx-filename-extension': [1, { extensions: ['.tsx'] }],
-        'import/no-extraneous-dependencies': [
-            'error',
-            {
-                devDependencies: true,
-                optionalDependencies: true,
-                peerDependencies: true,
-            },
-        ],
+        'import/no-extraneous-dependencies': 0,
         'import/extensions': [
             'error',
             'ignorePackages',
@@ -47,6 +40,6 @@ module.exports = {
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error'],
         'no-unused-vars': 'off',
-        '@typescript-eslint/no-unused-vars': 'error',
+        '@typescript-eslint/no-unused-vars': ['error', {'argsIgnorePattern': '^_'}]
     }
 }
