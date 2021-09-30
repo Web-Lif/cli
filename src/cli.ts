@@ -2,6 +2,7 @@
 
 import { prompt } from 'inquirer'
 import { join } from 'path'
+import { existsSync } from 'fs'
 import { copyFile, readFile, writeFile, readdir } from 'fs/promises'
 import { compile } from 'handlebars'
 import { green, red } from 'ansi-colors'
@@ -48,9 +49,28 @@ async function writeFilePackage ({
     console.log(green(`+ package.json`))
 }
 
+function updateConfig () {
+    copyPresetFile('.eslintrc.js.preset')
+    copyPresetFile('.gitignore.preset')
+    copyPresetFile('.prettierrc.json.preset')
+    copyPresetFile('babel.config.js.preset')
+    copyPresetFile('jest.config.ts.preset')
+    copyPresetFile('tsconfig.json.preset')
+}
+
+
 async function main () {
     const files = await readdir(process.cwd())
-    if (files.length > 0) throw red('must be a non-empty directory.')
+
+    // 如果文件存在, 项目存在，则更新所有的文件信息
+    if (existsSync(join(process.cwd(), 'package.json'))) {
+        updateConfig()
+        return;
+    }
+
+    if (files.length > 0) {
+        throw red('must be a non-empty directory.')
+    }
 
     const result = await prompt([{
         type: 'input',
@@ -73,12 +93,7 @@ async function main () {
     const { name, author, version,  license }: PackageCfg = result
     
     /** 异步复制文件到创建的文件夹中 */
-    copyPresetFile('.eslintrc.js.preset')
-    copyPresetFile('.gitignore.preset')
-    copyPresetFile('.prettierrc.json.preset')
-    copyPresetFile('babel.config.js.preset')
-    copyPresetFile('jest.config.ts.preset')
-    copyPresetFile('tsconfig.json.preset')
+    updateConfig();
     writeFilePackage({
         name,
         author,
