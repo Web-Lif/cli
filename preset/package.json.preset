@@ -4,6 +4,7 @@
     "version": "{{version}}",
     "license": "{{license}}",
     "scripts": {
+        "lint:script": "eslint src --ext .js,.jsx,.ts,.tsx",
         "test": "jest"
     },
     "dependencies": {
@@ -11,6 +12,6 @@
         "react-dom": "^17.0.2"
     },
     "devDependencies": {
-        "@weblif/lif-tools": "^0.0.1"
+        "@weblif/preset-cli": "^0.0.2"
     }
 }
