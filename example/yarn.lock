@@ -1505,10 +1505,10 @@
     "@typescript-eslint/types" "4.32.0"
     "eslint-visitor-keys" "^2.0.0"
 
-"@weblif/preset-cli@^0.0.3":
-  "integrity" "sha512-wHgRjaiONsPP3OsywwrTEqdaLLD+Hb+xfkO1f0adwE+V9eXFmxRE30urWhrrXabMo58my6bLRR24bqQeX3mMNw=="
-  "resolved" "https://registry.npmjs.org/@weblif/preset-cli/-/preset-cli-0.0.3.tgz"
-  "version" "0.0.3"
+"@weblif/preset-cli@^0.0.4":
+  "integrity" "sha512-HbsyD95szFHXsTQ21pdPcyG1Ogg7Gar/CmsmejSRbnczNKtfe4pQZSvNAecFvi6qLwgUz47j7LhKVuDZeMA2Jg=="
+  "resolved" "https://registry.npmjs.org/@weblif/preset-cli/-/preset-cli-0.0.4.tgz"
+  "version" "0.0.4"
   dependencies:
     "ansi-colors" "^4.1.1"
     "handlebars" "^4.7.7"
