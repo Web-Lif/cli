@@ -1,8 +1,8 @@
 {
-    "name": "{{name}}",
-    "author": "{{author}}",
-    "version": "{{version}}",
-    "license": "{{license}}",
+    "name": "test1",
+    "author": "",
+    "version": "0.0.1-canary",
+    "license": "MIT",
     "scripts": {
         "lint:script": "eslint src --ext .js,.jsx,.ts,.tsx",
         "test": "jest"
