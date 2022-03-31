@@ -15,7 +15,7 @@ import { green, red } from 'ansi-colors'
  */
 async function copyPresetFile(fileName: string) {
 
-    const file = fileName.substr(0, fileName.length - 7)
+    const file = fileName.substring(0, fileName.length - 7)
     copyFile(
         join(__dirname, '..', 'preset', fileName),
         join(process.cwd(), file)

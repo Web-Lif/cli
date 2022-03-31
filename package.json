@@ -1,5 +1,5 @@
 {
-  "name": "@weblif/preset-cli",
+  "name": "@weblif/cli",
   "author": "苯苯 <854363956@qq.com>",
   "version": "0.1.0",
   "bin": "bin/cli.js",
