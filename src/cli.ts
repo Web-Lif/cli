@@ -77,7 +77,7 @@ async function main () {
                         if (!file.dir) {
                             files[key].async("uint8array").then((data) => {
                                 const fileDir = key.replace(projectName, '')
-                                let path = join(process.cwd(), key)
+                                let path = join(process.cwd(), fileDir)
                                 if (process.env.TEST === 'true') {
                                     path = join(process.cwd(), 'tests', fileDir)
                                 }
