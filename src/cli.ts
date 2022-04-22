@@ -1,105 +1,101 @@
 #!/usr/bin/env node
 
 import { prompt } from 'inquirer'
+import request from 'axios'
+import { Bar } from 'cli-progress'
 import { join } from 'path'
-import { existsSync } from 'fs'
-import { copyFile, readFile, writeFile, readdir } from 'fs/promises'
-import { compile } from 'handlebars'
+import { existsSync, outputFile, readdir } from 'fs-extra'
+import JSZip from 'jszip'
 import { green, red } from 'ansi-colors'
 
-/**
- * 复制文件到目录信息
- * 
- * @param project  用户输入的项目名称, 也就是生成的文件夹信息
- * @param fileName 要复制的文件信息
- */
-async function copyPresetFile(fileName: string) {
-
-    const file = fileName.substring(0, fileName.length - 7)
-    copyFile(
-        join(__dirname, '..', 'preset', fileName),
-        join(process.cwd(), file)
-    ).then(() => {
-        console.log(green(`+ ${file}`))
-    })
+type InputType = {
+    projectType: 'normal' | 'ms-template' 
+    projectVersion: 'latest'
 }
-
-type PackageCfg = {
-    name: string 
-    author: string
-    version: string
-    license: string
-}
-
-async function writeFilePackage ({
-    name,
-    author,
-    version,
-    license
-}: PackageCfg) {
-    const txt = await readFile(join(__dirname, '..', 'preset', 'package.json.preset'), 'utf8')
-    const template = compile(txt)
-    const content = template({
-        name,
-        author,
-        version,
-        license
-    })
-    await writeFile(join(process.cwd(), 'package.json'), content)
-    console.log(green(`+ package.json`))
-}
-
-function updateConfig () {
-    copyPresetFile('.eslintrc.js.preset')
-    copyPresetFile('.gitignore.preset')
-    copyPresetFile('.prettierrc.json.preset')
-    copyPresetFile('babel.config.js.preset')
-    copyPresetFile('jest.config.ts.preset')
-    copyPresetFile('tsconfig.json.preset')
-}
-
 
 async function main () {
     const files = await readdir(process.cwd())
 
     // 如果文件存在, 项目存在，则更新所有的文件信息
-    if (existsSync(join(process.cwd(), 'package.json'))) {
-        updateConfig()
-        return;
+    if (files.length > 0 && process.env.TEST !== 'true') {
+        console.log(red('E The current directory must be an empty directory'))
+        return 
     }
 
-    if (files.length > 0) {
-        throw red('must be a non-empty directory.')
-    }
-
-    const result = await prompt([{
-        type: 'input',
-        name: 'name',
-        message: "Please enter the project name:",
+    const result = await prompt<InputType>([{
+        type: 'list',
+        name: 'projectType',
+        message: "What type of project are you trying to create ?",
+        choices: [
+          'ms-template',
+        ],
     }, {
-        type: 'input',
-        name: 'author',
-        message: "Please enter the author information:",
-    }, {
-        type: 'input',
-        name: 'license',
-        message: "Please enter the open source license default (MIT):",
-    },{
-        type: 'input',
-        name: 'version',
-        message: "Please enter the version number default (0.0.1-canary):",
+        type: 'list',
+        name: 'projectVersion',
+        message: "What version are you going to choose ?",
+        choices: [
+            'latest'
+        ]
     }])
 
-    const { name, author, version,  license }: PackageCfg = result
-    
-    /** 异步复制文件到创建的文件夹中 */
-    updateConfig();
-    writeFilePackage({
-        name,
-        author,
-        version: version || '0.0.1-canary',
-        license: license || 'MIT'
-    })
+    // 下载最新的项目, 进行创建
+    if (result.projectType === 'ms-template' && result.projectVersion === 'latest') {
+        const fileDownload = new Bar({
+            format: 'Working | {bar} | {percentage}% || {value}/{total}',
+            barCompleteChar: '\u2588',
+            barIncompleteChar: '\u2591',
+            hideCursor: true
+        });
+        
+        try {
+            const { data, headers } = await request.get('https://codeload.github.com/Web-Lif/ms-template/zip/refs/heads/canary', {
+                responseType: "stream"
+            })
+
+            const totalLength = Number.parseInt(headers['content-length'])
+
+            fileDownload.start(totalLength, 0, {
+                task: 'download'
+            }) 
+
+            let bytes: any[] = []
+            let bytesLength: number = 0
+            data.on('data', (chunk: any) => {
+                bytes.push(chunk)
+                bytesLength += chunk.length
+                fileDownload.update(bytesLength)
+            })
+
+            data.on('end', () => {
+                fileDownload.stop()
+                const buf = Buffer.concat(bytes);
+                JSZip.loadAsync(buf).then((zip) => {
+                    const projectName = 'ms-template-canary'
+                    const files = zip.folder(projectName)?.files || {};
+                    Object.keys(files).forEach(key => {
+                        const file = files[key]
+                        if (!file.dir) {
+                            files[key].async("uint8array").then((data) => {
+                                const fileDir = key.replace(projectName, '')
+                                let path = join(process.cwd(), key)
+                                if (process.env.TEST === 'true') {
+                                    path = join(process.cwd(), 'tests', fileDir)
+                                }
+                                outputFile(path, data).then(() => {
+                                    console.log(green(`+ ${fileDir}`))
+                                }).catch(err => {
+                                    console.log(red(`E ${fileDir}\n - ${err.message}`))
+                                });
+                            })
+                        }
+                    })
+                })
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
 }
 
 main().catch((e) => {
